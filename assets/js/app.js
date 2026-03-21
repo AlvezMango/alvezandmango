@@ -36,7 +36,7 @@ async function saveDraftToSupabase(item, user){
     parent_album_qty: item.selectionType === 'Set' ? Number(item.replicaQty || 0) : 0,
     has_presentation_box: false,
     total_price: Number(item.price || 0) || 0,
-    photographer_name: user && user.role === 'photographer' ? (user.photographerName || user.studioName || null) : null,
+    photographer_name: user && user.role === 'photographer' ? (user.email || null) : null,
     photographer_instagram: user && user.role === 'photographer' ? (user.website || null) : null,
     guest_name: user && user.role === 'guest' ? (user.photographerName || user.studioName || 'Guest User') : null,
     guest_email: user && user.role === 'guest' ? (user.email || null) : null,
@@ -117,14 +117,12 @@ async function loadDraftsFromSupabase(user){
   const rows = Array.isArray(data) ? data : [];
   return rows.filter(row => {
     if(user && user.role === 'photographer'){
-      const possible = [user.photographerName, user.studioName, user.email].filter(Boolean);
-      if(!row.photographer_name && !row.guest_email) return true;
-      return possible.includes(row.photographer_name) || possible.includes(row.guest_email);
+      return !!row.photographer_name && String(row.photographer_name).trim().toLowerCase() === String(user.email || '').trim().toLowerCase();
     }
     if(user && user.role === 'guest'){
-      return !row.guest_email || row.guest_email === user.email;
+      return !!row.guest_email && String(row.guest_email).trim().toLowerCase() === String(user.email || '').trim().toLowerCase();
     }
-    return true;
+    return false;
   }).map(row => normalizeSupabaseDraft(row, user));
 }
 
@@ -144,7 +142,7 @@ async function createSharedDraftForPhotographer(project, photographerEmail, gues
     parent_album_qty: project.selectionType === 'Set' ? Number(project.replicaQty || 0) : 0,
     has_presentation_box: false,
     total_price: Number(project.price || 0) || 0,
-    photographer_name: photographerEmail,
+    photographer_name: String(photographerEmail).trim().toLowerCase(),
     photographer_instagram: null,
     guest_name: guestUser && (guestUser.photographerName || guestUser.studioName) ? (guestUser.photographerName || guestUser.studioName) : 'Guest User',
     guest_email: guestUser && guestUser.email ? guestUser.email : null,
@@ -236,13 +234,18 @@ function setupRegister(){
     if(users.some(u=>u.email.toLowerCase()===data.email.toLowerCase())){
       showMessage('registerMsg','An account with this email already exists.', true); return;
     }
+    data.email = String(data.email || '').trim().toLowerCase();
+    data.website = String(data.website || '').trim();
+    data.phone = String(data.phone || '').trim();
+    data.city = String(data.city || '').trim();
+    data.country = String(data.country || '').trim();
     data.approved=false;
+    data.status='pending';
     data.role='photographer';
     users.push(data);
     saveUsers(users);
-    setCurrentUser(data);
-    showMessage('registerMsg','Registration saved locally. In the real site, approval can unlock photographer pricing.', false);
-    setTimeout(()=>location.href='dashboard.html', 500);
+    showMessage('registerMsg','Registration received. Your account is pending approval before you can log in.', false);
+    form.reset();
   });
 }
 function setupLogin(){
@@ -262,6 +265,9 @@ function setupLogin(){
     const user=readUsers().find(u=>u.email.toLowerCase()===email && u.password===password);
     if(!user){
       showMessage('loginMsg','Email or password not found. Use the demo account button to test the photographer area.', true); return;
+    }
+    if(user.role === 'photographer' && !user.approved){
+      showMessage('loginMsg','Your account is pending approval. Please wait until we approve your photographer account.', true); return;
     }
     setCurrentUser(user);
     location.href='dashboard.html';
@@ -1028,7 +1034,7 @@ function setupPhotographerDraftEditor(){
         parent_album_type: projects[idx].selectionType === 'Set' ? (projects[idx].replicaSize || null) : null,
         parent_album_qty: projects[idx].selectionType === 'Set' ? Number(projects[idx].replicaQty || 0) : 0,
         total_price: Number(projects[idx].price || 0) || 0,
-        photographer_name: user.photographerName || user.studioName || null,
+        photographer_name: user.email || null,
         photographer_instagram: user.website || null,
         notes: [
           projects[idx].printOnCover ? 'Print on cover: yes' : null,
