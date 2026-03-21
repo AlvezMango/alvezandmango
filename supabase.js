@@ -1,17 +1,17 @@
 const SUPABASE_URL = "https://jbwlwbawssjimugtayts.supabase.co";
 const SUPABASE_KEY = "sb_publishable_fMXuCisXnwyFqYhBuQrrFg_38HgpDgK";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 window.saveDraft = async function () {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('drafts')
     .insert([
       {
         draft_name: "Test Draft",
         status: "draft",
         photographer_name: "Test Photographer",
-        photographer_instagram: "@test",
+        photographer_instagram: "@test"
       }
     ]);
 
