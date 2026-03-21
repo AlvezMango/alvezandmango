@@ -50,6 +50,19 @@ async function saveDraftToSupabase(item, user){
   return { data: data && data[0] ? data[0] : null };
 }
 
+async function updateDraftInSupabase(remoteId, updates){
+  const client = getSupabaseClient();
+  if(!client || !remoteId) return { skipped:true };
+  const { data, error } = await client
+    .from('drafts')
+    .update(updates)
+    .eq('id', remoteId)
+    .select()
+    .limit(1);
+  if(error) return { error };
+  return { data: data && data[0] ? data[0] : null };
+}
+
 
 function storageAvailable(){
   try{
@@ -538,56 +551,9 @@ function setupCoverModal(){
   }
 }
 
-async function loadDraftsFromSupabase(user){
-  const client = getSupabaseClient();
-  if(!client) return [];
-
-  const { data, error } = await client
-    .from('drafts')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if(error){
-    console.error("Supabase load error:", error);
-    return [];
-  }
-
-  const rows = Array.isArray(data) ? data : [];
-  return rows.filter(d => {
-    if(user.role === 'photographer'){
-      const profileName = (user.photographerName || '').trim().toLowerCase();
-      const studioName = (user.studioName || '').trim().toLowerCase();
-      const draftPhotographer = String(d.photographer_name || '').trim().toLowerCase();
-      if(profileName && draftPhotographer === profileName) return true;
-      if(studioName && draftPhotographer === studioName) return true;
-      return false;
-    }
-    if(user.role === 'guest'){
-      return String(d.guest_email || '').trim().toLowerCase() === String(user.email || '').trim().toLowerCase();
-    }
-    return true;
-  }).map(d => ({
-    id: d.id,
-    title: d.draft_name || 'Untitled Project',
-    albumType: d.album_type || 'Album',
-    selectionType: d.album_type || 'Album',
-    size: d.album_size || '—',
-    cover: d.cover_color || '—',
-    coverMaterial: d.cover_material || '—',
-    spreads: d.spreads || 0,
-    status: ({draft:'Draft', pending:'In review', approved:'Approved', in_production:'In production', delivered:'Shipped'})[String(d.status || '').toLowerCase()] || 'Draft',
-    created: d.created_at ? String(d.created_at).slice(0,10) : '—',
-    price: Number(d.total_price || 0),
-    remoteId: d.id
-  }));
-}
-
-async function setupDashboard(){
+function setupDashboard(){
   const user=ensureAuth(); if(!user) return;
-  let list = await loadDraftsFromSupabase(user);
-  if(!list.length){
-    list = readProjects().filter(p => p.userEmail===user.email).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')) || String(b.id||'').localeCompare(String(a.id||'')));
-  }
+  const list=readProjects().filter(p => p.userEmail===user.email).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')) || String(b.id||'').localeCompare(String(a.id||'')));
   const body=document.getElementById('projectRows');
   if(document.getElementById('projectCount')) document.getElementById('projectCount').textContent=list.length;
   if(document.getElementById('draftCount')) document.getElementById('draftCount').textContent=list.filter(p=>p.status==='Draft').length;
@@ -919,7 +885,7 @@ function setupPhotographerDraftEditor(){
   form.addEventListener('input', refreshSummaryAndQuote);
   form.addEventListener('change', refreshSummaryAndQuote);
   refreshSummaryAndQuote();
-  form.addEventListener('submit', function(e){
+  form.addEventListener('submit', async function(e){
     e.preventDefault();
     let projects = readProjects();
     const idx = projects.findIndex(p => p.id === project.id);
@@ -928,18 +894,57 @@ function setupPhotographerDraftEditor(){
     const result = getPricingResult(fd.get('selectionType') || 'Album', fd.get('size'), Number(fd.get('spreads') || 20), Number(fd.get('quantity') || 1), Number(fd.get('replicaQty') || 2), fd.get('replicaSize') || defaultReplicaSize(fd.get('size')), fd.get('printOnCover') === 'yes', fd.get('pictureWindow') === 'yes', 'photographer');
     projects[idx] = {...projects[idx], title: fd.get('projectTitle'), albumType: 'Album', selectionType: fd.get('selectionType') || 'Album', size: fd.get('size'), spreads: Number(fd.get('spreads') || 20), quantity: Number(fd.get('quantity') || 1), replicaQty: Number(fd.get('replicaQty') || 2), replicaSize: fd.get('replicaSize') || defaultReplicaSize(fd.get('size')), printOnCover: fd.get('printOnCover') === 'yes', pictureWindow: fd.get('pictureWindow') === 'yes', cover: document.getElementById('coverInput').value, coverMaterial: document.getElementById('coverMaterialInput').value, price: roundMoney(result.value || 0)};
     if(!saveProjects(projects)){ showMessage('editorMsg', 'Unable to save changes in browser storage.', true); return; }
-    showMessage('editorMsg', 'Project updated locally.', false);
+    let remoteError = null;
+    if(projects[idx].remoteId){
+      const remotePayload = {
+        draft_name: projects[idx].title || 'Untitled Project',
+        status: projects[idx].status === 'In review' ? 'pending' : 'draft',
+        album_type: projects[idx].selectionType || projects[idx].albumType || 'Album',
+        album_size: projects[idx].size || null,
+        cover_material: projects[idx].coverMaterial || null,
+        cover_color: projects[idx].cover || null,
+        spreads: Number(projects[idx].spreads || 0) || null,
+        has_parent_albums: projects[idx].selectionType === 'Set',
+        parent_album_type: projects[idx].selectionType === 'Set' ? (projects[idx].replicaSize || null) : null,
+        parent_album_qty: projects[idx].selectionType === 'Set' ? Number(projects[idx].replicaQty || 0) : 0,
+        total_price: Number(projects[idx].price || 0) || 0,
+        photographer_name: user.photographerName || user.studioName || null,
+        photographer_instagram: user.website || null,
+        notes: [
+          projects[idx].printOnCover ? 'Print on cover: yes' : null,
+          projects[idx].pictureWindow ? 'Picture window: yes' : null
+        ].filter(Boolean).join(' | ') || null,
+        updated_at: new Date().toISOString()
+      };
+      const remoteResult = await updateDraftInSupabase(projects[idx].remoteId, remotePayload);
+      if(remoteResult && remoteResult.error){
+        remoteError = remoteResult.error;
+        console.error('Supabase draft update error:', remoteError);
+      }
+    }
+    showMessage('editorMsg', remoteError ? 'Project updated locally. Database sync failed.' : 'Project updated successfully.', !!remoteError);
     refreshSummaryAndQuote();
   });
   if(submitBtn){
-    submitBtn.addEventListener('click', function(){
+    submitBtn.addEventListener('click', async function(){
       let projects = readProjects();
       const idx = projects.findIndex(p => p.id === project.id);
       if(idx === -1) return;
       projects[idx].status = 'In review';
       projects[idx].notification = 'Project moved to In review';
       if(!saveProjects(projects)){ showMessage('editorMsg', 'Unable to update project status in browser storage.', true); return; }
-      showMessage('editorMsg', 'Project placed and moved to In review.', false);
+      let remoteError = null;
+      if(projects[idx].remoteId){
+        const remoteResult = await updateDraftInSupabase(projects[idx].remoteId, {
+          status: 'pending',
+          updated_at: new Date().toISOString()
+        });
+        if(remoteResult && remoteResult.error){
+          remoteError = remoteResult.error;
+          console.error('Supabase status update error:', remoteError);
+        }
+      }
+      showMessage('editorMsg', remoteError ? 'Project moved to In review locally. Database sync failed.' : 'Project placed and moved to In review.', !!remoteError);
       document.querySelectorAll('[data-project-status]').forEach(el => el.textContent = 'In review');
       renderStatusRail('In review', 'editorStatusRail');
     });
