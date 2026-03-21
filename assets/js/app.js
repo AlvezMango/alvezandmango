@@ -36,7 +36,7 @@ async function saveDraftToSupabase(item, user){
     parent_album_qty: item.selectionType === 'Set' ? Number(item.replicaQty || 0) : 0,
     has_presentation_box: false,
     total_price: Number(item.price || 0) || 0,
-    photographer_name: user && user.role === 'photographer' ? (user.email || null) : null,
+    photographer_name: user && user.role === 'photographer' ? (user.photographerName || user.studioName || null) : null,
     photographer_instagram: user && user.role === 'photographer' ? (user.website || null) : null,
     guest_name: user && user.role === 'guest' ? (user.photographerName || user.studioName || 'Guest User') : null,
     guest_email: user && user.role === 'guest' ? (user.email || null) : null,
@@ -44,114 +44,6 @@ async function saveDraftToSupabase(item, user){
       item.printOnCover ? 'Print on cover: yes' : null,
       item.pictureWindow ? 'Picture window: yes' : null
     ].filter(Boolean).join(' | ') || null
-  };
-  const { data, error } = await client.from('drafts').insert([payload]).select().limit(1);
-  if(error) return { error };
-  return { data: data && data[0] ? data[0] : null };
-}
-
-async function updateDraftInSupabase(remoteId, updates){
-  const client = getSupabaseClient();
-  if(!client || !remoteId) return { skipped:true };
-  const { data, error } = await client
-    .from('drafts')
-    .update(updates)
-    .eq('id', remoteId)
-    .select()
-    .limit(1);
-  if(error) return { error };
-  return { data: data && data[0] ? data[0] : null };
-}
-
-function mapSupabaseStatusToUi(status){
-  const map = {
-    draft: 'Draft',
-    pending: 'In review',
-    approved: 'Approved',
-    in_production: 'In production',
-    delivered: 'Shipped',
-    cancelled: 'Cancelled'
-  };
-  return map[status] || 'Draft';
-}
-
-function normalizeSupabaseDraft(row, user){
-  return {
-    id: row.id,
-    remoteId: row.id,
-    userEmail: user && user.email ? user.email : '',
-    title: row.draft_name || 'Untitled Project',
-    albumType: row.album_type || 'Album',
-    selectionType: row.album_type || 'Album',
-    size: row.album_size || '—',
-    cover: row.cover_color || '—',
-    coverMaterial: row.cover_material || '—',
-    spreads: row.spreads || 0,
-    quantity: row.main_qty || 1,
-    replicaQty: row.parent_album_qty || 0,
-    replicaSize: row.parent_album_type || defaultReplicaSize(row.album_size || '30×30'),
-    printOnCover: typeof row.notes === 'string' && row.notes.includes('Print on cover: yes'),
-    pictureWindow: typeof row.notes === 'string' && row.notes.includes('Picture window: yes'),
-    status: mapSupabaseStatusToUi(row.status),
-    created: row.created_at ? String(row.created_at).slice(0,10) : '',
-    price: Number(row.total_price || 0),
-    sharedByGuest: !!row.guest_email,
-    photographerName: row.photographer_name || '',
-    photographerInstagram: row.photographer_instagram || '',
-    guestEmail: row.guest_email || '',
-    guestName: row.guest_name || ''
-  };
-}
-
-async function loadDraftsFromSupabase(user){
-  const client = getSupabaseClient();
-  if(!client) return [];
-  const { data, error } = await client
-    .from('drafts')
-    .select('*')
-    .order('created_at', { ascending: false });
-  if(error){
-    console.error('Supabase load error:', error);
-    return [];
-  }
-  const rows = Array.isArray(data) ? data : [];
-  return rows.filter(row => {
-    if(user && user.role === 'photographer'){
-      return !!row.photographer_name && String(row.photographer_name).trim().toLowerCase() === String(user.email || '').trim().toLowerCase();
-    }
-    if(user && user.role === 'guest'){
-      return !!row.guest_email && String(row.guest_email).trim().toLowerCase() === String(user.email || '').trim().toLowerCase();
-    }
-    return false;
-  }).map(row => normalizeSupabaseDraft(row, user));
-}
-
-async function createSharedDraftForPhotographer(project, photographerEmail, guestUser){
-  const client = getSupabaseClient();
-  if(!client || !photographerEmail || !project) return { skipped:true };
-  const payload = {
-    draft_name: project.title || 'Untitled Project',
-    status: 'draft',
-    album_type: project.selectionType || project.albumType || 'Album',
-    album_size: project.size || null,
-    cover_material: project.coverMaterial || null,
-    cover_color: project.cover || null,
-    spreads: Number(project.spreads || 0) || null,
-    has_parent_albums: project.selectionType === 'Set',
-    parent_album_type: project.selectionType === 'Set' ? (project.replicaSize || null) : null,
-    parent_album_qty: project.selectionType === 'Set' ? Number(project.replicaQty || 0) : 0,
-    has_presentation_box: false,
-    total_price: Number(project.price || 0) || 0,
-    photographer_name: String(photographerEmail).trim().toLowerCase(),
-    photographer_instagram: null,
-    guest_name: guestUser && (guestUser.photographerName || guestUser.studioName) ? (guestUser.photographerName || guestUser.studioName) : 'Guest User',
-    guest_email: guestUser && guestUser.email ? guestUser.email : null,
-    notes: [
-      'Shared by guest',
-      project.printOnCover ? 'Print on cover: yes' : null,
-      project.pictureWindow ? 'Picture window: yes' : null
-    ].filter(Boolean).join(' | '),
-    updated_at: new Date().toISOString()
   };
   const { data, error } = await client.from('drafts').insert([payload]).select().limit(1);
   if(error) return { error };
@@ -234,18 +126,13 @@ function setupRegister(){
     if(users.some(u=>u.email.toLowerCase()===data.email.toLowerCase())){
       showMessage('registerMsg','An account with this email already exists.', true); return;
     }
-    data.email = String(data.email || '').trim().toLowerCase();
-    data.website = String(data.website || '').trim();
-    data.phone = String(data.phone || '').trim();
-    data.city = String(data.city || '').trim();
-    data.country = String(data.country || '').trim();
     data.approved=false;
-    data.status='pending';
     data.role='photographer';
     users.push(data);
     saveUsers(users);
-    showMessage('registerMsg','Registration received. Your account is pending approval before you can log in.', false);
-    form.reset();
+    setCurrentUser(data);
+    showMessage('registerMsg','Registration saved locally. In the real site, approval can unlock photographer pricing.', false);
+    setTimeout(()=>location.href='dashboard.html', 500);
   });
 }
 function setupLogin(){
@@ -265,9 +152,6 @@ function setupLogin(){
     const user=readUsers().find(u=>u.email.toLowerCase()===email && u.password===password);
     if(!user){
       showMessage('loginMsg','Email or password not found. Use the demo account button to test the photographer area.', true); return;
-    }
-    if(user.role === 'photographer' && !user.approved){
-      showMessage('loginMsg','Your account is pending approval. Please wait until we approve your photographer account.', true); return;
     }
     setCurrentUser(user);
     location.href='dashboard.html';
@@ -654,19 +538,10 @@ function setupCoverModal(){
   }
 }
 
-async function setupDashboard(){
+function setupDashboard(){
   const user=ensureAuth(); if(!user) return;
-  let list = [];
-  try{
-    list = await loadDraftsFromSupabase(user);
-  }catch(e){
-    console.error('Unable to load dashboard projects from Supabase', e);
-  }
-  if(!list.length){
-    list=readProjects().filter(p => p.userEmail===user.email).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')) || String(b.id||'').localeCompare(String(a.id||'')));
-  }else{
-    try{ saveProjects(list); }catch(e){ console.error('Unable to cache remote dashboard projects locally', e); }
-  }
+  const list=readProjects().filter(p => p.userEmail===user.email).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')) || String(b.id||'').localeCompare(String(a.id||'')));
+  renderPendingApprovals(user);
   const body=document.getElementById('projectRows');
   if(document.getElementById('projectCount')) document.getElementById('projectCount').textContent=list.length;
   if(document.getElementById('draftCount')) document.getElementById('draftCount').textContent=list.filter(p=>p.status==='Draft').length;
@@ -677,7 +552,7 @@ async function setupDashboard(){
     }else{
       body.innerHTML=list.map(p=>`
       <tr>
-        <td><a href="#" class="linkish" onclick="openDraft('${p.id}');return false;">${p.remoteId || p.id}</a></td>
+        <td><a href="#" class="linkish" onclick="openDraft('${p.id}');return false;">${p.id}</a></td>
         <td><a href="#" class="linkish" onclick="openDraft('${p.id}');return false;">${p.title}</a></td>
         <td>${p.selectionType || p.albumType}</td>
         <td>${p.size}</td>
@@ -719,30 +594,17 @@ function deleteDraft(id){
   saveProjects(projects);
   window.location.reload();
 }
-async function setupOrders(){
+function setupOrders(){
   const user=ensureAuth(); if(!user) return;
+  const list=readProjects().filter(p => p.userEmail===user.email).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')) || String(b.id||'').localeCompare(String(a.id||'')));
   const wrap=document.getElementById('ordersList');
   if(!wrap) return;
-
-  let list = [];
-  try{
-    list = await loadDraftsFromSupabase(user);
-  }catch(e){
-    console.error('Unable to load orders from Supabase', e);
-  }
-
-  if(!list.length){
-    list=readProjects().filter(p => p.userEmail===user.email).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')) || String(b.id||'').localeCompare(String(a.id||'')));
-  }else{
-    try{ saveProjects(list); }catch(e){ console.error('Unable to cache remote orders locally', e); }
-  }
-
   if(!list.length){ wrap.innerHTML='<div class="empty">No orders found yet.</div>'; return; }
   wrap.innerHTML=list.map(p=>`
     <div class="panel" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap">
         <div>
-          <div class="kicker">${p.remoteId || p.id}</div>
+          <div class="kicker">${p.id}</div>
           <h3 style="margin:6px 0 6px"><a href="#" class="linkish" onclick="openDraft('${p.id}');return false;">${p.title}</a></h3>
           <div class="small">${p.selectionType || p.albumType} · ${p.size} · ${p.cover} · ${p.spreads} spreads${p.sharedByGuest ? ' · Shared by guest' : ''}</div>
           <div class="small" style="margin-top:4px">${user.role === 'guest' ? 'Quote available through your photographer' : 'Estimate: €' + Number(p.price || 0).toFixed(2)}</div>
@@ -1011,7 +873,7 @@ function setupPhotographerDraftEditor(){
   form.addEventListener('input', refreshSummaryAndQuote);
   form.addEventListener('change', refreshSummaryAndQuote);
   refreshSummaryAndQuote();
-  form.addEventListener('submit', async function(e){
+  form.addEventListener('submit', function(e){
     e.preventDefault();
     let projects = readProjects();
     const idx = projects.findIndex(p => p.id === project.id);
@@ -1020,57 +882,18 @@ function setupPhotographerDraftEditor(){
     const result = getPricingResult(fd.get('selectionType') || 'Album', fd.get('size'), Number(fd.get('spreads') || 20), Number(fd.get('quantity') || 1), Number(fd.get('replicaQty') || 2), fd.get('replicaSize') || defaultReplicaSize(fd.get('size')), fd.get('printOnCover') === 'yes', fd.get('pictureWindow') === 'yes', 'photographer');
     projects[idx] = {...projects[idx], title: fd.get('projectTitle'), albumType: 'Album', selectionType: fd.get('selectionType') || 'Album', size: fd.get('size'), spreads: Number(fd.get('spreads') || 20), quantity: Number(fd.get('quantity') || 1), replicaQty: Number(fd.get('replicaQty') || 2), replicaSize: fd.get('replicaSize') || defaultReplicaSize(fd.get('size')), printOnCover: fd.get('printOnCover') === 'yes', pictureWindow: fd.get('pictureWindow') === 'yes', cover: document.getElementById('coverInput').value, coverMaterial: document.getElementById('coverMaterialInput').value, price: roundMoney(result.value || 0)};
     if(!saveProjects(projects)){ showMessage('editorMsg', 'Unable to save changes in browser storage.', true); return; }
-    let remoteError = null;
-    if(projects[idx].remoteId){
-      const remotePayload = {
-        draft_name: projects[idx].title || 'Untitled Project',
-        status: projects[idx].status === 'In review' ? 'pending' : 'draft',
-        album_type: projects[idx].selectionType || projects[idx].albumType || 'Album',
-        album_size: projects[idx].size || null,
-        cover_material: projects[idx].coverMaterial || null,
-        cover_color: projects[idx].cover || null,
-        spreads: Number(projects[idx].spreads || 0) || null,
-        has_parent_albums: projects[idx].selectionType === 'Set',
-        parent_album_type: projects[idx].selectionType === 'Set' ? (projects[idx].replicaSize || null) : null,
-        parent_album_qty: projects[idx].selectionType === 'Set' ? Number(projects[idx].replicaQty || 0) : 0,
-        total_price: Number(projects[idx].price || 0) || 0,
-        photographer_name: user.email || null,
-        photographer_instagram: user.website || null,
-        notes: [
-          projects[idx].printOnCover ? 'Print on cover: yes' : null,
-          projects[idx].pictureWindow ? 'Picture window: yes' : null
-        ].filter(Boolean).join(' | ') || null,
-        updated_at: new Date().toISOString()
-      };
-      const remoteResult = await updateDraftInSupabase(projects[idx].remoteId, remotePayload);
-      if(remoteResult && remoteResult.error){
-        remoteError = remoteResult.error;
-        console.error('Supabase draft update error:', remoteError);
-      }
-    }
-    showMessage('editorMsg', remoteError ? 'Project updated locally. Database sync failed.' : 'Project updated successfully.', !!remoteError);
+    showMessage('editorMsg', 'Project updated locally.', false);
     refreshSummaryAndQuote();
   });
   if(submitBtn){
-    submitBtn.addEventListener('click', async function(){
+    submitBtn.addEventListener('click', function(){
       let projects = readProjects();
       const idx = projects.findIndex(p => p.id === project.id);
       if(idx === -1) return;
       projects[idx].status = 'In review';
       projects[idx].notification = 'Project moved to In review';
       if(!saveProjects(projects)){ showMessage('editorMsg', 'Unable to update project status in browser storage.', true); return; }
-      let remoteError = null;
-      if(projects[idx].remoteId){
-        const remoteResult = await updateDraftInSupabase(projects[idx].remoteId, {
-          status: 'pending',
-          updated_at: new Date().toISOString()
-        });
-        if(remoteResult && remoteResult.error){
-          remoteError = remoteResult.error;
-          console.error('Supabase status update error:', remoteError);
-        }
-      }
-      showMessage('editorMsg', remoteError ? 'Project moved to In review locally. Database sync failed.' : 'Project placed and moved to In review.', !!remoteError);
+      showMessage('editorMsg', 'Project placed and moved to In review.', false);
       document.querySelectorAll('[data-project-status]').forEach(el => el.textContent = 'In review');
       renderStatusRail('In review', 'editorStatusRail');
     });
@@ -1140,7 +963,7 @@ function setupGuestDraftEditor(){
     return;
   }
   document.querySelectorAll('[data-project-title]').forEach(el => el.textContent = project.title || 'Untitled Project');
-  document.querySelectorAll('[data-project-id]').forEach(el => el.textContent = project.remoteId || project.id || '—');
+  document.querySelectorAll('[data-project-id]').forEach(el => el.textContent = project.id || '—');
   document.querySelectorAll('[data-project-status]').forEach(el => el.textContent = project.status || '—');
   document.querySelectorAll('[data-project-created]').forEach(el => el.textContent = project.created || '—');
   ensureCoreOrderFields(form, 'Your names / project title');
@@ -1159,7 +982,6 @@ function setupGuestDraftEditor(){
   renderMaterialTabs(document.getElementById('coverMaterialInput').value);
   updateCoverTrigger(document.getElementById('coverInput').value);
   setupCoverModal();
-
   function refreshGuestSummary(){
     const fd = new FormData(form);
     applyPricingSelectionBehavior(form);
@@ -1177,140 +999,34 @@ function setupGuestDraftEditor(){
   form.addEventListener('input', refreshGuestSummary);
   form.addEventListener('change', refreshGuestSummary);
   refreshGuestSummary();
-
-  form.addEventListener('submit', async function(e){
+  form.addEventListener('submit', function(e){
     e.preventDefault();
     let projects = readProjects();
     const idx = projects.findIndex(p => p.id === project.id);
     if(idx === -1) return;
     const fd = new FormData(form);
-    projects[idx] = {
-      ...projects[idx],
-      title: fd.get('projectTitle'),
-      albumType: 'Album',
-      selectionType: fd.get('selectionType') || 'Album',
-      size: fd.get('size'),
-      spreads: Number(fd.get('spreads') || 20),
-      quantity: Number(fd.get('quantity') || 1),
-      replicaQty: Number(fd.get('replicaQty') || 2),
-      replicaSize: fd.get('replicaSize') || defaultReplicaSize(fd.get('size')),
-      printOnCover: fd.get('printOnCover') === 'yes',
-      pictureWindow: fd.get('pictureWindow') === 'yes',
-      cover: document.getElementById('coverInput').value,
-      coverMaterial: document.getElementById('coverMaterialInput').value,
-      price: 0
-    };
+    projects[idx] = {...projects[idx], title: fd.get('projectTitle'), albumType: 'Album', selectionType: fd.get('selectionType') || 'Album', size: fd.get('size'), spreads: Number(fd.get('spreads') || 20), quantity: Number(fd.get('quantity') || 1), replicaQty: Number(fd.get('replicaQty') || 2), replicaSize: fd.get('replicaSize') || defaultReplicaSize(fd.get('size')), printOnCover: fd.get('printOnCover') === 'yes', pictureWindow: fd.get('pictureWindow') === 'yes', cover: document.getElementById('coverInput').value, coverMaterial: document.getElementById('coverMaterialInput').value, price: 0};
     if(!saveProjects(projects)){ showMessage('guestEditorMsg', 'Unable to save changes in browser storage.', true); return; }
-
-    let remoteError = null;
-    if(projects[idx].remoteId){
-      const remotePayload = {
-        draft_name: projects[idx].title || 'Untitled Project',
-        status: 'draft',
-        album_type: projects[idx].selectionType || 'Album',
-        album_size: projects[idx].size || null,
-        cover_material: projects[idx].coverMaterial || null,
-        cover_color: projects[idx].cover || null,
-        spreads: Number(projects[idx].spreads || 0) || null,
-        has_parent_albums: projects[idx].selectionType === 'Set',
-        parent_album_type: projects[idx].selectionType === 'Set' ? (projects[idx].replicaSize || null) : null,
-        parent_album_qty: projects[idx].selectionType === 'Set' ? Number(projects[idx].replicaQty || 0) : 0,
-        total_price: 0,
-        guest_name: user.photographerName || user.studioName || 'Guest User',
-        guest_email: user.email || null,
-        notes: [
-          projects[idx].printOnCover ? 'Print on cover: yes' : null,
-          projects[idx].pictureWindow ? 'Picture window: yes' : null
-        ].filter(Boolean).join(' | ') || null,
-        updated_at: new Date().toISOString()
-      };
-      const remoteResult = await updateDraftInSupabase(projects[idx].remoteId, remotePayload);
-      if(remoteResult && remoteResult.error){
-        remoteError = remoteResult.error;
-        console.error('Supabase guest draft update error:', remoteError);
-      }
-    }else{
-      const remoteResult = await saveDraftToSupabase(projects[idx], user);
-      if(remoteResult && remoteResult.data && remoteResult.data.id){
-        projects[idx].remoteId = remoteResult.data.id;
-        saveProjects(projects);
-      }else if(remoteResult && remoteResult.error){
-        remoteError = remoteResult.error;
-        console.error('Supabase guest draft save error:', remoteError);
-      }
-    }
-
-    showMessage('guestEditorMsg', remoteError ? 'Project updated locally. Database sync failed.' : 'Project updated successfully.', !!remoteError);
+    showMessage('guestEditorMsg', 'Project updated locally. You can now share it with your photographer from this preview page.', false);
     document.querySelectorAll('[data-project-title]').forEach(el => el.textContent = projects[idx].title || 'Untitled Project');
     refreshGuestSummary();
   });
-
   const shareForm = document.getElementById('detailShareForm');
   if(shareForm){
-    shareForm.addEventListener('submit', async function(e){
+    shareForm.addEventListener('submit', function(e){
       e.preventDefault();
-      const email = document.getElementById('detailShareEmail').value.trim().toLowerCase();
+      const email = document.getElementById('detailShareEmail').value.trim();
       let projects = readProjects();
       const idx = projects.findIndex(p => p.id === project.id);
-      if(idx === -1){
-        showMessage('detailShareMsg', 'Unable to find the current draft.', true);
-        return;
+      if(idx !== -1){
+        const fd = new FormData(form);
+        projects[idx] = {...projects[idx], title: fd.get('projectTitle'), albumType: 'Album', selectionType: fd.get('selectionType') || 'Album', size: fd.get('size'), spreads: Number(fd.get('spreads') || 20), quantity: Number(fd.get('quantity') || 1), replicaQty: Number(fd.get('replicaQty') || 2), replicaSize: fd.get('replicaSize') || defaultReplicaSize(fd.get('size')), printOnCover: fd.get('printOnCover') === 'yes', pictureWindow: fd.get('pictureWindow') === 'yes', cover: document.getElementById('coverInput').value, coverMaterial: document.getElementById('coverMaterialInput').value};
+        if(!saveProjects(projects)){ showMessage('detailShareMsg', 'Unable to save your latest changes before sharing.', true); return; }
       }
-      const fd = new FormData(form);
-      projects[idx] = {
-        ...projects[idx],
-        title: fd.get('projectTitle'),
-        albumType: 'Album',
-        selectionType: fd.get('selectionType') || 'Album',
-        size: fd.get('size'),
-        spreads: Number(fd.get('spreads') || 20),
-        quantity: Number(fd.get('quantity') || 1),
-        replicaQty: Number(fd.get('replicaQty') || 2),
-        replicaSize: fd.get('replicaSize') || defaultReplicaSize(fd.get('size')),
-        printOnCover: fd.get('printOnCover') === 'yes',
-        pictureWindow: fd.get('pictureWindow') === 'yes',
-        cover: document.getElementById('coverInput').value,
-        coverMaterial: document.getElementById('coverMaterialInput').value
-      };
-      if(!saveProjects(projects)){ showMessage('detailShareMsg', 'Unable to save your latest changes before sharing.', true); return; }
-
-      let remoteError = null;
-      if(projects[idx].remoteId){
-        const remoteResult = await updateDraftInSupabase(projects[idx].remoteId, {
-          draft_name: projects[idx].title || 'Untitled Project',
-          album_type: projects[idx].selectionType || 'Album',
-          album_size: projects[idx].size || null,
-          cover_material: projects[idx].coverMaterial || null,
-          cover_color: projects[idx].cover || null,
-          spreads: Number(projects[idx].spreads || 0) || null,
-          has_parent_albums: projects[idx].selectionType === 'Set',
-          parent_album_type: projects[idx].selectionType === 'Set' ? (projects[idx].replicaSize || null) : null,
-          parent_album_qty: projects[idx].selectionType === 'Set' ? Number(projects[idx].replicaQty || 0) : 0,
-          guest_name: user.photographerName || user.studioName || 'Guest User',
-          guest_email: user.email || null,
-          updated_at: new Date().toISOString()
-        });
-        if(remoteResult && remoteResult.error){
-          remoteError = remoteResult.error;
-          console.error('Supabase guest draft pre-share update error:', remoteError);
-        }
-      }
-
       const copy = convertGuestDraft(email);
-      const sharedRemote = await createSharedDraftForPhotographer(projects[idx], email, user);
-      if(sharedRemote && sharedRemote.error){
-        remoteError = sharedRemote.error;
-        console.error('Supabase guest share error:', remoteError);
-      }
-      showMessage('detailShareMsg',
-        copy
-          ? (remoteError ? `Draft shared locally to ${email}. Database share failed.` : `Draft shared successfully to ${email}.`)
-          : 'Unable to share the draft right now.',
-        !copy || !!remoteError
-      );
+      showMessage('detailShareMsg', copy ? `Draft shared locally to ${email}. It can now appear in that photographer account as a draft.` : 'Unable to share the draft right now.', !copy);
     });
   }
-
   const deleteBtn = document.getElementById('detailDeleteBtn');
   if(deleteBtn){
     if(project.status === 'Draft'){
