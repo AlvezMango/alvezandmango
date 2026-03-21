@@ -1,3 +1,7 @@
+const SUPABASE_URL = "https://jbwlwbawssjimugtayts.supabase.co";
+const SUPABASE_KEY = "sb_publishable_fMXuCisXnwyFqYhBuQrrFg_38HgpDgK";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function storageAvailable(){
   try{
