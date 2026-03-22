@@ -1,9 +1,19 @@
 
+function getSupabaseConfig(){
+  const url = window.SUPABASE_URL || window.supabaseUrl || window.__SUPABASE_URL || null;
+  const key = window.SUPABASE_ANON_KEY || window.SUPABASE_KEY || window.supabaseKey || window.__SUPABASE_ANON_KEY || null;
+  return { url, key };
+}
 function getSupabaseClient(){
   if(window.supabaseClient) return window.supabaseClient;
-  if(window.supabase && window.SUPABASE_URL && window.SUPABASE_KEY){
+  const createClient =
+    (window.supabase && typeof window.supabase.createClient === 'function' && window.supabase.createClient.bind(window.supabase)) ||
+    (window.supabaseJs && typeof window.supabaseJs.createClient === 'function' && window.supabaseJs.createClient.bind(window.supabaseJs)) ||
+    null;
+  const cfg = getSupabaseConfig();
+  if(createClient && cfg.url && cfg.key){
     try{
-      window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+      window.supabaseClient = createClient(cfg.url, cfg.key);
       return window.supabaseClient;
     }catch(e){
       console.error('Unable to initialise Supabase client', e);
@@ -11,6 +21,15 @@ function getSupabaseClient(){
     }
   }
   return null;
+}
+function getSupabaseMissingReason(){
+  const hasLibrary =
+    !!(window.supabase && typeof window.supabase.createClient === 'function') ||
+    !!(window.supabaseJs && typeof window.supabaseJs.createClient === 'function');
+  const cfg = getSupabaseConfig();
+  if(!hasLibrary) return 'Supabase library is missing. Make sure the CDN script is loading.';
+  if(!cfg.url || !cfg.key) return 'Supabase config is missing. Check your supabase.js file and make sure it sets SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_KEY).';
+  return 'Supabase could not be initialized.';
 }
 
 async function saveDraftToSupabase(item, user){
@@ -1405,7 +1424,7 @@ async function setupRegister(){
     e.preventDefault();
     const client = getSupabaseClient();
     if(!client){
-      showMessage('registerMsg','Supabase is not available on this page.', true);
+      showMessage('registerMsg', getSupabaseMissingReason(), true);
       return;
     }
     const data=Object.fromEntries(new FormData(form).entries());
@@ -1452,7 +1471,7 @@ async function setupLogin(){
     e.preventDefault();
     const client = getSupabaseClient();
     if(!client){
-      showMessage('loginMsg','Supabase is not available on this page.', true);
+      showMessage('loginMsg', getSupabaseMissingReason(), true);
       return;
     }
     const email=document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -1478,7 +1497,7 @@ async function setupLogin(){
 }
 async function forgotPassword(){
   const client = getSupabaseClient();
-  if(!client) return alert('Supabase is not available on this page.');
+  if(!client) return alert(getSupabaseMissingReason());
   const email = prompt('Enter your email:');
   if(!email) return;
   const { error } = await client.auth.resetPasswordForEmail(email, {
