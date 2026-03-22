@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login · Alvez & Mango</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="../supabase.js"></script>
+  <script defer src="./assets/admin.js"></script>
+</head>
+<body data-page="admin-login">
+  <div class="login-shell">
+    <section class="login-left">
+      <div class="login-card">
+        <div class="brand" style="padding:0 0 18px;border:none;margin-bottom:6px">
+          <div class="brand-badge">A&amp;M</div>
+          <div>
+            <h1 style="font-size:18px;margin:0">Alvez &amp; Mango</h1>
+            <p>private admin back office</p>
+          </div>
+        </div>
+        <h1>Admin area</h1>
+        <p class="hero-copy">A separate private control room for orders, photographers, approvals, analytics, and manual order entry. No public link is required — only approved internal accounts can enter.</p>
+        <form id="adminLoginForm">
+          <div class="form-grid">
+            <div class="field full">
+              <label>Email</label>
+              <input id="loginEmail" type="email" placeholder="admin@alvezandmango.com" required>
+            </div>
+            <div class="field full">
+              <label>Password</label>
+              <input id="loginPassword" type="password" required>
+            </div>
+          </div>
+          <div class="top-actions" style="margin-top:18px">
+            <button class="btn" type="submit">Enter admin area</button>
+            <a class="btn secondary" href="../index.html">Back to site</a>
+          </div>
+        </form>
+        <div id="loginMsg" class="notice" style="display:block">Use your internal admin or staff account.</div>
+      </div>
+    </section>
+    <aside class="login-right"></aside>
+  </div>
+</body>
+</html>

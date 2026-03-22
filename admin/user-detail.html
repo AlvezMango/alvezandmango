@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photographer Detail · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="../supabase.js"></script>
+  <script defer src="./assets/admin.js"></script>
+</head>
+<body data-page="admin-user-detail">
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-badge">A&amp;M</div><div><h1>Admin back office</h1><p>private internal panel</p></div></div>
+      <div class="nav-group">
+        <div class="nav-label">Overview</div>
+        <a data-nav class="nav-link" href="dashboard.html"><span class="icon">◻</span><span>Dashboard</span></a>
+        <a data-nav class="nav-link" href="orders.html"><span class="icon">◎</span><span>Orders</span></a>
+        <a data-nav class="nav-link" href="new-order.html"><span class="icon">＋</span><span>Manual Order</span></a>
+        <a data-nav class="nav-link" href="users.html"><span class="icon">◉</span><span>Photographers</span></a>
+        <a data-nav class="nav-link" href="analytics.html"><span class="icon">▣</span><span>Analytics</span></a>
+      </div>
+      <div class="sidebar-footer"><div style="font-weight:700;margin-bottom:4px">Profile view</div><div class="small">Use this to inspect one photographer in detail, with all drafts and orders in one place.</div></div>
+    </aside>
+    <main class="content">
+      <div class="topbar">
+        <div class="page-title"><h2 id="detailName">Photographer</h2><p><span id="detailEmail">—</span> · <span id="detailMeta">—</span></p></div>
+        <div class="top-actions"><span id="detailStatus"></span><button class="btn secondary" id="approveBtn">Approve</button><button class="btn ghost" id="blockBtn">Block</button><a class="btn secondary" href="users.html">Back</a></div>
+      </div>
+      <div id="detailWrap">
+        <section class="two-col-metric" id="detailCards"></section>
+        <section class="grid-2 page-section">
+          <div class="card panel"><h3>Contact & account</h3><div id="contactRows" class="kpi-list"></div></div>
+          <div class="card panel"><h3>Notes</h3><p class="panel-sub">This panel is ready for internal notes and future activity tracking. Last login and page history can be added once we store that data.</p><div class="empty">Tracking fields are not yet in the database, so this page currently shows everything that already exists.</div></div>
+        </section>
+        <section class="grid-2 page-section">
+          <div class="card panel"><h3>Orders</h3><div class="table-wrap"><table><thead><tr><th>Order</th><th>Album</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody id="detailOrders"></tbody></table></div></div>
+          <div class="card panel"><h3>Drafts</h3><div class="table-wrap"><table><thead><tr><th>Draft</th><th>Album</th><th>Size</th><th>Total</th><th>Date</th></tr></thead><tbody id="detailDrafts"></tbody></table></div></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual Order · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="../supabase.js"></script>
+  <script defer src="./assets/admin.js"></script>
+</head>
+<body data-page="admin-new-order">
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-badge">A&amp;M</div><div><h1>Admin back office</h1><p>private internal panel</p></div></div>
+      <div class="nav-group">
+        <div class="nav-label">Overview</div>
+        <a data-nav class="nav-link" href="dashboard.html"><span class="icon">◻</span><span>Dashboard</span></a>
+        <a data-nav class="nav-link" href="orders.html"><span class="icon">◎</span><span>Orders</span></a>
+        <a data-nav class="nav-link" href="new-order.html"><span class="icon">＋</span><span>Manual Order</span></a>
+        <a data-nav class="nav-link" href="users.html"><span class="icon">◉</span><span>Photographers</span></a>
+        <a data-nav class="nav-link" href="analytics.html"><span class="icon">▣</span><span>Analytics</span></a>
+      </div>
+      <div class="sidebar-footer"><div style="font-weight:700;margin-bottom:4px">Manual job intake</div><div class="small">For orders that came by email, phone, WhatsApp, or walk-in, but still need to live in the admin system.</div></div>
+    </aside>
+    <main class="content">
+      <div class="topbar">
+        <div class="page-title"><h2>New manual order</h2><p>Create internal jobs that did not come through the public website flow.</p></div>
+        <div class="top-actions"><div id="topUser" class="top-right-user"></div><button class="btn" onclick="signOutAdmin()">Sign out</button></div>
+      </div>
+      <div class="card panel">
+        <form id="manualOrderForm" class="form-grid">
+          <div class="field"><label>Order number</label><input name="order_number" placeholder="ADM-2026-001"></div>
+          <div class="field"><label>Source</label><select name="source"><option value="email">Email</option><option value="phone">Phone</option><option value="walk-in">Walk-in</option><option value="whatsapp">WhatsApp</option><option value="other">Other</option></select></div>
+          <div class="field"><label>Photographer</label><select id="manualPhotographer" name="photographer_name"></select></div>
+          <div class="field"><label>Guest / client</label><select id="manualGuest" name="guest_id"></select></div>
+          <div class="field"><label>Photographer Instagram</label><input name="photographer_instagram" placeholder="@name"></div>
+          <div class="field"><label>Status</label><select name="status"><option value="pending">Pending</option><option value="approved">Approved</option><option value="completed">Completed</option></select></div>
+          <div class="field"><label>Album type</label><input name="album_type" placeholder="Wedding album"></div>
+          <div class="field"><label>Album size</label><input name="album_size" placeholder="30×30"></div>
+          <div class="field"><label>Cover material</label><input name="cover_material" placeholder="Velvet"></div>
+          <div class="field"><label>Cover color</label><input name="cover_color" placeholder="Olive"></div>
+          <div class="field"><label>Cover text</label><input name="cover_text" placeholder="Sophia & Daniel"></div>
+          <div class="field"><label>Font choice</label><input name="font_choice" placeholder="Serif gold"></div>
+          <div class="field"><label>Spreads</label><input name="spreads" type="number" min="0"></div>
+          <div class="field"><label>Total price</label><input name="total_price" type="number" step="0.01" min="0"></div>
+          <div class="field"><label>Parent album type</label><input name="parent_album_type" placeholder="20×20"></div>
+          <div class="field"><label>Parent album quantity</label><input name="parent_album_qty" type="number" min="0"></div>
+          <div class="field"><label>Presentation box</label><select name="has_presentation_box"><option value="">No</option><option value="on">Yes</option></select></div>
+          <div class="field"><label>Box type</label><input name="box_type" placeholder="Linen box"></div>
+          <div class="field full"><label>Internal notes</label><textarea name="internal_notes" placeholder="Anything you want your team to know."></textarea></div>
+          <div class="field full"><label>Production notes</label><textarea name="production_notes" placeholder="Special production instructions."></textarea></div>
+          <div class="top-actions full"><button class="btn" type="submit">Create order</button><a class="btn secondary" href="orders.html">View all orders</a></div>
+        </form>
+        <div id="newOrderMsg"></div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
