@@ -1,5 +1,5 @@
 (function(){
-  const ADMIN_EMAILS = ['demo@alvezmango.com'];
+  const ADMIN_EMAILS = ['admin@alvezmango.com', 'demo@alvezmango.com'];
 
   function showMessage(text, isError){
     const el = document.getElementById('loginMsg');
@@ -95,14 +95,14 @@
         return;
       }
 
-      const role = ADMIN_EMAILS.includes(email) || (profile && String(profile.status || '').toLowerCase() === 'admin') ? 'admin' : 'photographer';
+      const role = ADMIN_EMAILS.includes(email) ? 'admin' : 'photographer';
       saveCurrentUser({
         id: data.user.id,
         email,
         role,
         approved: !profile || String(profile.status || '').replaceAll('"','').toLowerCase() !== 'pending',
         photographerName: profile?.name || data.user.user_metadata?.name || email,
-        studioName: profile?.company_name || profile?.name || 'Photographer',
+        studioName: profile?.company_name || profile?.company || profile?.name || 'Photographer',
         website: profile?.website || '',
         instagram: profile?.instagram || '',
         city: profile?.city || '',
@@ -146,7 +146,7 @@
     const fillDemo = document.getElementById('fillDemo');
     if(fillDemo){
       fillDemo.addEventListener('click', function(){
-        document.getElementById('loginEmail').value = 'demo@alvezmango.com';
+        document.getElementById('loginEmail').value = 'admin@alvezmango.com';
         document.getElementById('loginPassword').value = 'demo123';
       });
     }
