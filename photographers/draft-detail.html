@@ -11,24 +11,24 @@
 <script defer src="../assets/js/app.js"></script>
 </head>
 <body data-page="draft-detail">
-<div class="topbar home-topbar">
-  <div class="container nav">
-    <a class="brand-lockup home-brand" href="../index.html">
-  <img src="../assets/img/logo-black.svg" alt="Alvez & Mango logo">
-  <div class="logo-text">
-    <strong>Alvez & Mango</strong>
-    <span>bespoke handmade albums</span>
+<header class="site-header portal-header scrolled" id="siteHeader">
+  <div class="brand-wrap">
+    <a href="../index.html" class="brand brand-logo" aria-label="Alvez and Mango home">
+      <img class="logo logo-white" src="../assets/img/logo-white.svg" alt="Alvez &amp; Mango logo" />
+      <img class="logo logo-black" src="../assets/img/logo-black.svg" alt="Alvez &amp; Mango logo" />
+    </a>
   </div>
-</a>
-    <nav class="nav-links home-nav-links">
-      <a href="../index.html">Home</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="orders.html">Orders</a>
-      <a href="guest-preview.html">Guest preview</a>
-      <a href="#" onclick="history.back();return false;">Back</a>
-    </nav>
-  </div>
-</div>
+  <nav class="nav portal-nav">
+    <a href="../index.html">Home</a>
+    <a href="../albums.html">Albums</a>
+    <a href="../materials.html">Materials</a>
+    <a href="../process.html">Our Process</a>
+    <a href="../contact.html">Contact</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="orders.html" class="active">Orders</a>
+    <a href="#" onclick="signOut();return false;" class="login-link">Sign Out</a>
+  </nav>
+</header>
 <section class="section">
   <div class="container"><div id="storageWarning"></div></div>
   <div class="container">
@@ -47,7 +47,7 @@
 
       <div class="grid-2">
         <div class="panel">
-          <h3 style="font-size:30px;font-family:Georgia,serif;margin:0 0 14px">Project summary</h3>
+          <h3 class="portal-subtitle">Project summary</h3>
           <div class="summary-list">
             <div class="summary-row"><strong>ID</strong><span data-project-id></span></div>
             <div class="summary-row"><strong>Album type</strong><span data-project-type></span></div>
@@ -63,8 +63,8 @@
 
         <div class="panel">
           <div class="kicker">Share</div>
-          <h3 style="font-size:30px;font-family:Georgia,serif;margin:8px 0 10px">Share with your photographer</h3>
-          <p class="small">Use this to demonstrate how a couple or guest could send a selected draft to their photographer.</p>
+          <h3 class="portal-subtitle">Share with your photographer</h3>
+          <p class="small">Share a saved draft with your photographer for review and next steps.</p>
           <form id="detailShareForm">
             <div class="field">
               <label>Photographer email</label>
@@ -82,5 +82,29 @@
     </div>
   </div>
 </section>
+
+<footer class="site-footer portal-footer">
+  <div class="footer-brand">
+    <img src="../assets/img/logo-black.svg" alt="Alvez &amp; Mango logo" />
+  </div>
+  <div class="footer-col footer-meta">
+    <h4>Get in Touch</h4>
+    <div class="footer-item"><span>Phone</span><a href="tel:+35722750775">+357 22750775</a></div>
+    <div class="footer-item"><span>WhatsApp</span><a href="https://wa.me/35799890811" target="_blank" rel="noopener">+357 99890811</a></div>
+    <div class="footer-item"><span>Email</span><a href="mailto:hello@alvezandmango.com">hello@alvezandmango.com</a></div>
+  </div>
+  <div class="footer-col footer-meta">
+    <h4>Studio &amp; Social</h4>
+    <div class="footer-item"><span>Instagram</span><a href="https://instagram.com/alvez.and.mango" target="_blank" rel="noopener">alvez.and.mango</a></div>
+    <div class="footer-item"><span>Website</span><a href="https://www.alvezandmango.com" target="_blank" rel="noopener">www.alvezandmango.com</a></div>
+  </div>
+  <div class="footer-col footer-meta">
+    <h4>Visit Us</h4>
+    <div class="footer-address">Kemanes Print Shop<br>Demofontos 7<br>1075 Nicosia<br>Cyprus</div>
+  </div>
+  <div class="copyright">© 2024 Alvez &amp; Mango. All rights reserved.</div>
+</footer>
+<script src="../assets/js/site.js"></script>
+
 </body>
 </html>

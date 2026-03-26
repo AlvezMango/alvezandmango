@@ -12,25 +12,25 @@
 </head>
 <body data-page="dashboard">
 
-<div class="topbar home-topbar">
-  <div class="container nav">
-    <a class="brand-lockup home-brand" href="../index.html">
-  <img src="../assets/img/logo-black.svg" alt="Alvez & Mango logo">
-  <div class="logo-text">
-    <strong>Alvez & Mango</strong>
-    <span>bespoke handmade albums</span>
+<header class="site-header portal-header scrolled" id="siteHeader">
+  <div class="brand-wrap">
+    <a href="../index.html" class="brand brand-logo" aria-label="Alvez and Mango home">
+      <img class="logo logo-white" src="../assets/img/logo-white.svg" alt="Alvez &amp; Mango logo" />
+      <img class="logo logo-black" src="../assets/img/logo-black.svg" alt="Alvez &amp; Mango logo" />
+    </a>
   </div>
-</a>
-    <nav class="nav-links home-nav-links">
-      <a href="../index.html">Home</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="new-order.html">New order</a>
-      <a href="orders.html">Orders</a>
-      <a href="guest-preview.html">Guest preview</a>
-      <a href="#" onclick="signOut();return false;">Sign out</a>
-    </nav>
-  </div>
-</div>
+  <nav class="nav portal-nav">
+    <a href="../index.html">Home</a>
+    <a href="../albums.html">Albums</a>
+    <a href="../materials.html">Materials</a>
+    <a href="../process.html">Our Process</a>
+    <a href="../contact.html">Contact</a>
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="new-order.html">New Order</a>
+    <a href="orders.html">Orders</a>
+    <a href="#" onclick="signOut();return false;" class="login-link">Sign Out</a>
+  </nav>
+</header>
 <section class="section">
   <div class="container"><div id="storageWarning"></div></div>
   <div class="container">
@@ -38,7 +38,7 @@
       <div><div class="kicker">Welcome back</div><h2>Studio dashboard for <span data-studio-name></span></h2></div>
       <div class="hero-actions"><a class="btn" href="new-order.html">Create new album order</a><a class="btn secondary" href="orders.html">View all orders</a></div>
     </div>
-    <div class="note-strip" style="margin-bottom:18px">Photographer notifications: shared client drafts can be opened and converted into active projects.</div><div class="stat-row">
+    <div class="stat-row">
       <div class="stat"><strong id="projectCount">0</strong><span class="small">Total projects</span></div>
       <div class="stat"><strong id="draftCount">0</strong><span class="small">Drafts</span></div>
       <div class="stat"><strong id="reviewCount">0</strong><span class="small">In review / active</span></div>
@@ -47,7 +47,7 @@
   <div class="container" id="approvalPanel" style="display:none;margin-top:18px">
     <div class="panel">
       <div class="kicker">Approvals</div>
-      <h3 style="font-size:30px;font-family:Georgia,serif;margin:8px 0 14px">Pending photographer accounts</h3>
+      <h3 class="portal-subtitle">Pending photographer accounts</h3>
       <div id="approvalMsg" style="margin-bottom:14px"></div>
       <div id="approvalList"></div>
     </div>
@@ -72,6 +72,30 @@
     </main>
   </div>
 </section>
+
+
+<footer class="site-footer portal-footer">
+  <div class="footer-brand">
+    <img src="../assets/img/logo-black.svg" alt="Alvez &amp; Mango logo" />
+  </div>
+  <div class="footer-col footer-meta">
+    <h4>Get in Touch</h4>
+    <div class="footer-item"><span>Phone</span><a href="tel:+35722750775">+357 22750775</a></div>
+    <div class="footer-item"><span>WhatsApp</span><a href="https://wa.me/35799890811" target="_blank" rel="noopener">+357 99890811</a></div>
+    <div class="footer-item"><span>Email</span><a href="mailto:hello@alvezandmango.com">hello@alvezandmango.com</a></div>
+  </div>
+  <div class="footer-col footer-meta">
+    <h4>Studio &amp; Social</h4>
+    <div class="footer-item"><span>Instagram</span><a href="https://instagram.com/alvez.and.mango" target="_blank" rel="noopener">alvez.and.mango</a></div>
+    <div class="footer-item"><span>Website</span><a href="https://www.alvezandmango.com" target="_blank" rel="noopener">www.alvezandmango.com</a></div>
+  </div>
+  <div class="footer-col footer-meta">
+    <h4>Visit Us</h4>
+    <div class="footer-address">Kemanes Print Shop<br>Demofontos 7<br>1075 Nicosia<br>Cyprus</div>
+  </div>
+  <div class="copyright">© 2024 Alvez &amp; Mango. All rights reserved.</div>
+</footer>
+<script src="../assets/js/site.js"></script>
 
 </body>
 </html>

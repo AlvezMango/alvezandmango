@@ -1847,3 +1847,10 @@ body[data-page] *{
 body[data-page] .panel{
   padding:30px;
 }
+
+
+.contact-detail-layout .contact-card{padding:34px 30px;border:1px solid var(--line);}
+.contact-detail-layout .contact-detail{padding:0 0 14px;margin:0 0 14px;border-bottom:1px solid var(--line);font-family:Arial, Helvetica, sans-serif;}
+.contact-detail-layout .contact-detail:last-child{margin-bottom:0;}
+.contact-detail-layout .contact-detail span{display:block;margin-bottom:8px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
+.contact-detail-layout .contact-detail a,.contact-detail-layout .contact-card p{font-size:13px;line-height:1.8;color:var(--text);font-family:Arial, Helvetica, sans-serif;}

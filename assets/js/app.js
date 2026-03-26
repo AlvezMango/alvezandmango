@@ -135,8 +135,8 @@ function seedDemoData(){
     };
     saveUsers([demo]);
     const projects=[
-      {id:'AM-1001', userEmail:demo.email, title:'Sophia & Daniel', albumType:'Fine Art', selectionType:'Album', size:'30×30', cover:'Linen Sand', spreads:25, status:'In review', created:'2026-03-12', price:162},
-      {id:'AM-1002', userEmail:demo.email, title:'Christening Album', albumType:'Classic', selectionType:'Album', size:'20×20', cover:'Velvet Olive', spreads:20, status:'Draft', created:'2026-03-10', price:88}
+      {id:'AM-1001', userEmail:demo.email, title:'Sophia & Daniel', albumType:'Fine Art', selectionType:'Album', size:'30×30', cover:'Linen 01', spreads:25, status:'In review', created:'2026-03-12', price:162},
+      {id:'AM-1002', userEmail:demo.email, title:'Christening Album', albumType:'Classic', selectionType:'Album', size:'20×20', cover:'Suede 01', spreads:20, status:'Draft', created:'2026-03-10', price:88}
     ];
     saveProjects(projects);
     localStorage.setItem('am_seeded','1');
@@ -453,47 +453,19 @@ function applyPricingSelectionBehavior(form){
 
 
 function coverMaterials(){
+  const makeSwatches = (material, slug) => Array.from({length:20}, (_,i) => {
+    const number = String(i + 1).padStart(2,'0');
+    return {
+      name: `${material} ${number}`,
+      material,
+      image: `../assets/img/swatch-${slug}-${number}.jpg`
+    };
+  });
   return {
-    'Linen': [
-      {name:'Linen Sand', material:'Linen', color:'#d8c8b2'},
-      {name:'Linen Ivory', material:'Linen', color:'#ece4d6'},
-      {name:'Linen Stone', material:'Linen', color:'#b9b1a6'},
-      {name:'Linen Dusty Rose', material:'Linen', color:'#c8a6a1'},
-      {name:'Linen Oat', material:'Linen', color:'#cab89e'},
-      {name:'Linen Sage', material:'Linen', color:'#aab59d'},
-      {name:'Linen Mist Blue', material:'Linen', color:'#9eaaba'},
-      {name:'Linen Clay', material:'Linen', color:'#b68f79'}
-    ],
-    'Leatherette': [
-      {name:'Leatherette Black', material:'Leatherette', color:'#2b2b2b'},
-      {name:'Leatherette Camel', material:'Leatherette', color:'#b58053'},
-      {name:'Leatherette Chocolate', material:'Leatherette', color:'#5c4437'},
-      {name:'Leatherette Dove Grey', material:'Leatherette', color:'#9a9b9a'},
-      {name:'Leatherette Walnut', material:'Leatherette', color:'#7b5d47'},
-      {name:'Leatherette Taupe', material:'Leatherette', color:'#9a836f'},
-      {name:'Leatherette Cloud', material:'Leatherette', color:'#c8c6c1'},
-      {name:'Leatherette Midnight', material:'Leatherette', color:'#2e3546'}
-    ],
-    'Cotton': [
-      {name:'Cotton Pearl', material:'Cotton', color:'#e8e0d4'},
-      {name:'Cotton Almond', material:'Cotton', color:'#d8c9b0'},
-      {name:'Cotton Wheat', material:'Cotton', color:'#c6b08d'},
-      {name:'Cotton Dust Blue', material:'Cotton', color:'#a3b1bd'},
-      {name:'Cotton Terracotta', material:'Cotton', color:'#b8745c'},
-      {name:'Cotton Olive', material:'Cotton', color:'#848a63'},
-      {name:'Cotton Charcoal', material:'Cotton', color:'#56504b'},
-      {name:'Cotton Rosewood', material:'Cotton', color:'#9f6f68'}
-    ],
-    'Velvet': [
-      {name:'Velvet Olive', material:'Velvet', color:'#7e8362'},
-      {name:'Velvet Midnight', material:'Velvet', color:'#273248'},
-      {name:'Velvet Burgundy', material:'Velvet', color:'#6d2f39'},
-      {name:'Velvet Forest', material:'Velvet', color:'#2f5b48'},
-      {name:'Velvet Plum', material:'Velvet', color:'#5b425f'},
-      {name:'Velvet Rust', material:'Velvet', color:'#9a5841'},
-      {name:'Velvet Charcoal', material:'Velvet', color:'#414247'},
-      {name:'Velvet Dust Rose', material:'Velvet', color:'#b18286'}
-    ]
+    'Linen': makeSwatches('Linen', 'linen'),
+    'Cotton': makeSwatches('Cotton', 'cotton'),
+    'Faux Leather': makeSwatches('Faux Leather', 'faux-leather'),
+    'Suede': makeSwatches('Suede', 'suede')
   };
 }
 function coverSwatches(material){
@@ -514,24 +486,45 @@ function updateCoverTrigger(selectedName){
   if(nameEl) nameEl.textContent = item.name;
   if(materialEl) materialEl.textContent = item.material;
   if(thumbEl){
-    thumbEl.style.backgroundImage = 'none';
-    thumbEl.style.backgroundColor = item.color;
+    if(item.image){
+      thumbEl.style.backgroundImage = `url(${item.image})`;
+      thumbEl.style.backgroundColor = 'transparent';
+      thumbEl.style.backgroundSize = 'cover';
+      thumbEl.style.backgroundPosition = 'center';
+    } else {
+      thumbEl.style.backgroundImage = 'none';
+      thumbEl.style.backgroundColor = item.color || '#e7dfd4';
+    }
   }
 }
 function currentSelectedMaterial(){
   const el = document.getElementById('coverMaterialInput');
   return el ? el.value : 'Linen';
 }
+function materialLibraryCards(){
+  return {
+    'Linen': {image:'../assets/img/material-linen.jpg', label:'Linen', link:'View Colours'},
+    'Cotton': {image:'../assets/img/material-cotton.jpg', label:'Cotton', link:'View Colours'},
+    'Faux Leather': {image:'../assets/img/material-faux-leather.jpg', label:'Faux Leather', link:'View Colours'},
+    'Suede': {image:'../assets/img/material-suede.jpg', label:'Suede', link:'View Colours'}
+  };
+}
 function renderMaterialTabs(activeMaterial){
   const wrap = document.getElementById('materialTabs');
   if(!wrap) return;
+  const cards = materialLibraryCards();
   const materials = Object.keys(coverMaterials());
   wrap.innerHTML = materials.map(m => {
-    const minis = coverSwatches(m).slice(0,4).map(s => `<span style="background:${s.color}"></span>`).join('');
-    return `<div class="category-card ${m===activeMaterial ? 'active' : ''}" data-material="${m}">
-      <h4>${m}</h4>
-      <div class="category-mini">${minis}</div>
-    </div>`;
+    const card = cards[m] || {};
+    return `<button type="button" class="category-card material-source-card ${m===activeMaterial ? 'active' : ''}" data-material="${m}" aria-pressed="${m===activeMaterial ? 'true' : 'false'}">
+      <span class="material-source-media">
+        <img src="${card.image || ''}" alt="${card.label || m}">
+      </span>
+      <span class="material-source-copy">
+        <h4>${card.label || m}</h4>
+        <span class="text-link">${card.link || 'View Colours'}</span>
+      </span>
+    </button>`;
   }).join('');
   wrap.querySelectorAll('.category-card').forEach(card => {
     card.addEventListener('click', function(){
@@ -548,7 +541,7 @@ function renderCoverSwatches(selectedName, material){
   if(!wrap) return;
   wrap.innerHTML=coverSwatches(mat).map(item => `
     <div class="swatch-option ${selectedName===item.name ? 'selected':''}" data-cover="${item.name}" data-material="${item.material}">
-      <div class="swatch-sample" style="background:${item.color};"></div>
+      <div class="swatch-sample" style="background-image:url(${item.image}); background-size:cover; background-position:center;"></div>
       <div class="swatch-meta">
         <h4>${item.name}</h4>
         <div class="small">${item.material}</div>
@@ -578,7 +571,7 @@ function openCoverModalForMaterial(material){
   const title = document.getElementById('coverModalTitle');
   const subtitle = document.getElementById('coverModalSubtitle');
   if(title) title.textContent = material + ' colours';
-  if(subtitle) subtitle.textContent = 'Choose from 8 named swatches in ' + material + '.';
+  if(subtitle) subtitle.textContent = 'Choose from 20 swatches in ' + material + '.';
   const currentName = (document.getElementById('coverInput') || {}).value || '';
   const current = getCoverByName(currentName);
   const valid = coverSwatches(material).some(x => x.name === current.name);
@@ -825,7 +818,7 @@ function setupNewOrder(){
   ensureCoreOrderFields(form, isGuest ? 'Your names / project title' : 'Project title');
   const quoteEl=document.getElementById('quotePrice');
   renderMaterialTabs('Linen');
-  updateCoverTrigger('Linen Sand');
+  updateCoverTrigger('Linen 01');
   setupCoverModal();
   const shareForm = document.getElementById('shareForm');
   if(shareForm) shareForm.style.display = 'none';
@@ -955,7 +948,7 @@ function setupDraftDetail(){
   document.querySelectorAll('[data-project-type]').forEach(el => el.textContent = project.selectionType || project.albumType || '—');
   document.querySelectorAll('[data-project-size]').forEach(el => el.textContent = project.size || '—');
   document.querySelectorAll('[data-project-cover]').forEach(el => el.textContent = project.cover || '—');
-  document.querySelectorAll('[data-project-cover-material]').forEach(el => el.textContent = project.coverMaterial || (project.cover ? project.cover.split(' ')[0] : '—'));
+  document.querySelectorAll('[data-project-cover-material]').forEach(el => el.textContent = project.coverMaterial || (project.cover ? getCoverByName(project.cover).material : '—'));
   document.querySelectorAll('[data-project-spreads]').forEach(el => el.textContent = project.spreads || '—');
   document.querySelectorAll('[data-project-status]').forEach(el => el.textContent = project.status || '—');
   document.querySelectorAll('[data-project-created]').forEach(el => el.textContent = project.created || '—');
@@ -1034,8 +1027,8 @@ function setupPhotographerDraftEditor(){
   form.replicaQty.value = project.replicaQty ?? 2;
   form.printOnCover.value = project.printOnCover ? 'yes' : 'no';
   form.pictureWindow.value = project.pictureWindow ? 'yes' : 'no';
-  document.getElementById('coverInput').value = project.cover || 'Linen Sand';
-  document.getElementById('coverMaterialInput').value = project.coverMaterial || ((project.cover || 'Linen Sand').split(' ')[0]);
+  document.getElementById('coverInput').value = project.cover || 'Linen 01';
+  document.getElementById('coverMaterialInput').value = project.coverMaterial || getCoverByName(project.cover || 'Linen 01').material;
   renderMaterialTabs(document.getElementById('coverMaterialInput').value);
   updateCoverTrigger(document.getElementById('coverInput').value);
   setupCoverModal();
@@ -1135,13 +1128,13 @@ function makeUploadList(targetId){
 function renderAlbumPreview(targetId, coverName, material, size){
   const wrap = document.getElementById(targetId);
   if(!wrap) return;
-  const cover = getCoverByName(coverName || 'Linen Sand');
+  const cover = getCoverByName(coverName || 'Linen 01');
   wrap.innerHTML = `
     <div class="album-preview-card">
       <div class="album-book" style="background:${cover.color};"></div>
       <div>
         <div class="kicker">Album preview</div>
-        <h4 style="font-size:24px;font-family:Georgia,serif;margin:6px 0 8px">${coverName || 'Linen Sand'}</h4>
+        <h4 style="font-size:24px;font-family:Georgia,serif;margin:6px 0 8px">${coverName || 'Linen 01'}</h4>
         <div class="small">${material || cover.material} · ${size || '30×30'}</div>
         <div class="note-strip">This is a simple visual mockup of the chosen cover. Later this can become a richer 3D preview.</div>
       </div>
@@ -1177,8 +1170,8 @@ function setupGuestDraftEditor(){
   form.replicaQty.value = project.replicaQty ?? 2;
   form.printOnCover.value = project.printOnCover ? 'yes' : 'no';
   form.pictureWindow.value = project.pictureWindow ? 'yes' : 'no';
-  document.getElementById('coverInput').value = project.cover || 'Linen Sand';
-  document.getElementById('coverMaterialInput').value = project.coverMaterial || ((project.cover || 'Linen Sand').split(' ')[0]);
+  document.getElementById('coverInput').value = project.cover || 'Linen 01';
+  document.getElementById('coverMaterialInput').value = project.coverMaterial || getCoverByName(project.cover || 'Linen 01').material;
   renderMaterialTabs(document.getElementById('coverMaterialInput').value);
   updateCoverTrigger(document.getElementById('coverInput').value);
   setupCoverModal();
