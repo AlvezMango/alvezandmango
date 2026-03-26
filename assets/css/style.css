@@ -1856,90 +1856,12 @@ body[data-page] .panel{
 .contact-detail-layout .contact-detail a,.contact-detail-layout .contact-card p{font-size:13px;line-height:1.8;color:var(--text);font-family:Arial, Helvetica, sans-serif;}
 
 
-/* A&M 023: simple swatch preview + chooser */
-.material-preview{
-  display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);
-  gap:24px;
-  margin:8px 0 34px;
-  align-items:center;
-}
-.material-preview-stage{
-  position:relative;
-  min-height:360px;
-  border:1px solid rgba(236,230,223,.95);
-  background:center/cover no-repeat;
-  overflow:hidden;
-}
-.material-preview-stage::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(255,255,255,.06);
-}
-.material-preview-block{
-  position:absolute;
-  left:26%;
-  top:14%;
-  width:42%;
-  height:72%;
-  z-index:1;
-  border:1px solid rgba(255,255,255,.7);
-  background:center/cover no-repeat;
-}
-.material-preview-block::before{
-  content:"";
-  position:absolute;
-  left:7%;
-  top:0;
-  bottom:0;
-  width:2px;
-  background:rgba(255,255,255,.28);
-}
-.material-preview-copy h3{
-  margin:0 0 10px;
-  font-size:28px;
-  font-weight:400;
-}
-.material-preview-copy p{margin:0;}
-.swatch-button.real-swatch span{
-  font-size:12px;
-  line-height:1.5;
-  color:var(--text);
-}
-.material-modal-nav{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:2;
-  width:42px;
-  height:42px;
-  min-height:auto;
-  padding:0;
-  display:flex;
+.social-link{
+  display:inline-flex;
   align-items:center;
   justify-content:center;
-  background:rgba(255,255,255,.92);
-  color:var(--text);
-  border:1px solid rgba(66,59,53,.12);
-  font-size:28px;
-  line-height:1;
+  width:22px;
+  height:22px;
+  color:var(--muted);
 }
-.material-modal-prev{left:14px;}
-.material-modal-next{right:14px;}
-.material-modal-footer{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin-top:14px;
-}
-.material-modal-footer p{
-  margin:0;
-}
-@media (max-width: 900px){
-  .material-preview{grid-template-columns:1fr;}
-  .material-preview-stage{min-height:300px;}
-  .material-preview-block{left:25%; top:15%; width:46%; height:70%;}
-  .material-modal-footer{flex-direction:column; align-items:flex-start;}
-}
+.social-link:hover{color:var(--text);}

@@ -453,19 +453,95 @@ function applyPricingSelectionBehavior(form){
 
 
 function coverMaterials(){
-  const makeSwatches = (material, slug) => Array.from({length:20}, (_,i) => {
-    const number = String(i + 1).padStart(2,'0');
-    return {
-      name: `${material} ${number}`,
-      material,
-      image: `../assets/img/swatch-${slug}-${number}.jpg`
-    };
-  });
   return {
-    'Linen': makeSwatches('Linen', 'linen'),
-    'Cotton': makeSwatches('Cotton', 'cotton'),
-    'Faux Leather': makeSwatches('Faux Leather', 'faux-leather'),
-    'Suede': makeSwatches('Suede', 'suede')
+    'Linen': [
+      {name:"Desert Sand 006", material:"Linen", image:'../assets/img/swatch-linen-01.jpg'},
+      {name:"Natural Beige 003", material:"Linen", image:'../assets/img/swatch-linen-02.jpg'},
+      {name:"Harvest Wheat 002", material:"Linen", image:'../assets/img/swatch-linen-03.jpg'},
+      {name:"Stone Grey 004", material:"Linen", image:'../assets/img/swatch-linen-04.jpg'},
+      {name:"Dusty Rose 005", material:"Linen", image:'../assets/img/swatch-linen-05.jpg'},
+      {name:"Deep Charcoal 001", material:"Linen", image:'../assets/img/swatch-linen-06.jpg'}
+    ],
+    'Premium Cloth': [
+      {name:"Pure White 012", material:"Premium Cloth", image:'../assets/img/swatch-cotton-01.jpg'},
+      {name:"Soft Ivory 013", material:"Premium Cloth", image:'../assets/img/swatch-cotton-02.jpg'},
+      {name:"Desert Sand 018", material:"Premium Cloth", image:'../assets/img/swatch-cotton-03.jpg'},
+      {name:"Silver 028", material:"Premium Cloth", image:'../assets/img/swatch-cotton-04.jpg'},
+      {name:"Nude Beige 016", material:"Premium Cloth", image:'../assets/img/swatch-cotton-05.jpg'},
+      {name:"Golden Sand 017", material:"Premium Cloth", image:'../assets/img/swatch-cotton-06.jpg'},
+      {name:"Sky Blue 027", material:"Premium Cloth", image:'../assets/img/swatch-cotton-07.jpg'},
+      {name:"Fresh Mint 021", material:"Premium Cloth", image:'../assets/img/swatch-cotton-08.jpg'},
+      {name:"Aqua 026", material:"Premium Cloth", image:'../assets/img/swatch-cotton-09.jpg'},
+      {name:"Lime 020", material:"Premium Cloth", image:'../assets/img/swatch-cotton-10.jpg'},
+      {name:"Latte 011", material:"Premium Cloth", image:'../assets/img/swatch-cotton-11.jpg'},
+      {name:"Blossom Pink 023", material:"Premium Cloth", image:'../assets/img/swatch-cotton-12.jpg'},
+      {name:"Mustard 003", material:"Premium Cloth", image:'../assets/img/swatch-cotton-13.jpg'},
+      {name:"Camel 014", material:"Premium Cloth", image:'../assets/img/swatch-cotton-14.jpg'},
+      {name:"Amber 015", material:"Premium Cloth", image:'../assets/img/swatch-cotton-15.jpg'},
+      {name:"Soft Lilac 025", material:"Premium Cloth", image:'../assets/img/swatch-cotton-16.jpg'},
+      {name:"Grape 024", material:"Premium Cloth", image:'../assets/img/swatch-cotton-17.jpg'},
+      {name:"Warm Grey 010", material:"Premium Cloth", image:'../assets/img/swatch-cotton-18.jpg'},
+      {name:"Pine 004", material:"Premium Cloth", image:'../assets/img/swatch-cotton-19.jpg'},
+      {name:"Teal 006", material:"Premium Cloth", image:'../assets/img/swatch-cotton-20.jpg'},
+      {name:"Berry 005", material:"Premium Cloth", image:'../assets/img/swatch-cotton-21.jpg'},
+      {name:"Forest Green 019", material:"Premium Cloth", image:'../assets/img/swatch-cotton-22.jpg'},
+      {name:"Chocolate Brown 022", material:"Premium Cloth", image:'../assets/img/swatch-cotton-23.jpg'},
+      {name:"Burgundy 001", material:"Premium Cloth", image:'../assets/img/swatch-cotton-24.jpg'},
+      {name:"Midnight Blue 007", material:"Premium Cloth", image:'../assets/img/swatch-cotton-25.jpg'},
+      {name:"Deep Black 008", material:"Premium Cloth", image:'../assets/img/swatch-cotton-26.jpg'},
+      {name:"Carbon Black 009", material:"Premium Cloth", image:'../assets/img/swatch-cotton-27.jpg'},
+      {name:"Charcoal 002", material:"Premium Cloth", image:'../assets/img/swatch-cotton-28.jpg'}
+    ],
+    'Faux Leather': [
+      {name:"Champagne 016", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-01.jpg'},
+      {name:"Ivory 006", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-02.jpg'},
+      {name:"Pure White 021", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-03.jpg'},
+      {name:"Coral Blush 013", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-04.jpg'},
+      {name:"Powder Blue 012", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-05.jpg'},
+      {name:"Warm Stone 004", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-06.jpg'},
+      {name:"Ash Grey 018", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-07.jpg'},
+      {name:"Saddle Tan 005", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-08.jpg'},
+      {name:"Cocoa Brown 017", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-09.jpg'},
+      {name:"Olive Green 026", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-10.jpg'},
+      {name:"Slate Blue 023", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-11.jpg'},
+      {name:"Plum 020", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-12.jpg'},
+      {name:"Taupe 025", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-13.jpg'},
+      {name:"Steel Blue 014", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-14.jpg'},
+      {name:"Chestnut 001", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-15.jpg'},
+      {name:"Deep Ocean 003", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-16.jpg'},
+      {name:"Ink Blue 024", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-17.jpg'},
+      {name:"Graphite 019", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-18.jpg'},
+      {name:"Dark Mocha 022", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-19.jpg'},
+      {name:"Charcoal 008", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-20.jpg'},
+      {name:"Navy Classic 010", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-21.jpg'},
+      {name:"Forest Green 009", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-22.jpg'},
+      {name:"Burgundy 015", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-23.jpg'},
+      {name:"Midnight Teal 002", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-24.jpg'},
+      {name:"Crimson 007", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-25.jpg'},
+      {name:"Jet Black 011", material:"Faux Leather", image:'../assets/img/swatch-faux-leather-26.jpg'}
+    ],
+    'Suede': [
+      {name:"Snow 018", material:"Suede", image:'../assets/img/swatch-suede-01.jpg'},
+      {name:"Sandstone 012", material:"Suede", image:'../assets/img/swatch-suede-02.jpg'},
+      {name:"Platinum Grey 020", material:"Suede", image:'../assets/img/swatch-suede-03.jpg'},
+      {name:"Blush Rose 006", material:"Suede", image:'../assets/img/swatch-suede-04.jpg'},
+      {name:"Aqua 008", material:"Suede", image:'../assets/img/swatch-suede-05.jpg'},
+      {name:"Mist Blue 003", material:"Suede", image:'../assets/img/swatch-suede-06.jpg'},
+      {name:"Mauve 017", material:"Suede", image:'../assets/img/swatch-suede-07.jpg'},
+      {name:"Sage 004", material:"Suede", image:'../assets/img/swatch-suede-08.jpg'},
+      {name:"Baltic Blue 007", material:"Suede", image:'../assets/img/swatch-suede-09.jpg'},
+      {name:"Desert Tan 002", material:"Suede", image:'../assets/img/swatch-suede-10.jpg'},
+      {name:"Dusty Rose 019", material:"Suede", image:'../assets/img/swatch-suede-11.jpg'},
+      {name:"Graphite 001", material:"Suede", image:'../assets/img/swatch-suede-12.jpg'},
+      {name:"Amber Brown 010", material:"Suede", image:'../assets/img/swatch-suede-13.jpg'},
+      {name:"Indigo 015", material:"Suede", image:'../assets/img/swatch-suede-14.jpg'},
+      {name:"Deep Forest 005", material:"Suede", image:'../assets/img/swatch-suede-15.jpg'},
+      {name:"Pine 013", material:"Suede", image:'../assets/img/swatch-suede-16.jpg'},
+      {name:"Fuchsia 014", material:"Suede", image:'../assets/img/swatch-suede-17.jpg'},
+      {name:"Bordeaux 009", material:"Suede", image:'../assets/img/swatch-suede-18.jpg'},
+      {name:"Midnight Navy 016", material:"Suede", image:'../assets/img/swatch-suede-19.jpg'},
+      {name:"Carbon 011", material:"Suede", image:'../assets/img/swatch-suede-20.jpg'}
+    ]
   };
 }
 function coverSwatches(material){
@@ -504,7 +580,7 @@ function currentSelectedMaterial(){
 function materialLibraryCards(){
   return {
     'Linen': {image:'../assets/img/material-linen.jpg', label:'Linen', link:'View Colours'},
-    'Cotton': {image:'../assets/img/material-cotton.jpg', label:'Cotton', link:'View Colours'},
+    'Premium Cloth': {image:'../assets/img/material-cotton.jpg', label:'Premium Cloth', link:'View Colours'},
     'Faux Leather': {image:'../assets/img/material-faux-leather.jpg', label:'Faux Leather', link:'View Colours'},
     'Suede': {image:'../assets/img/material-suede.jpg', label:'Suede', link:'View Colours'}
   };
@@ -571,7 +647,7 @@ function openCoverModalForMaterial(material){
   const title = document.getElementById('coverModalTitle');
   const subtitle = document.getElementById('coverModalSubtitle');
   if(title) title.textContent = material + ' colours';
-  if(subtitle) subtitle.textContent = 'Choose from 20 swatches in ' + material + '.';
+  if(subtitle) subtitle.textContent = 'Choose from ' + coverSwatches(material).length + ' swatches in ' + material + '.';
   const currentName = (document.getElementById('coverInput') || {}).value || '';
   const current = getCoverByName(currentName);
   const valid = coverSwatches(material).some(x => x.name === current.name);
@@ -818,7 +894,7 @@ function setupNewOrder(){
   ensureCoreOrderFields(form, isGuest ? 'Your names / project title' : 'Project title');
   const quoteEl=document.getElementById('quotePrice');
   renderMaterialTabs('Linen');
-  updateCoverTrigger('Linen 01');
+  updateCoverTrigger("Desert Sand 006");
   setupCoverModal();
   const shareForm = document.getElementById('shareForm');
   if(shareForm) shareForm.style.display = 'none';

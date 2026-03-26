@@ -495,9 +495,6 @@ body[data-page="new-order"] .swatch-sample{
   background:#ece6df !important;
 }
 
-body[data-page] [style*="background-image"]{
-  background-image:none !important;
-}
 
 @media (max-width:1080px){
   body[data-page] .auth-wrap,
