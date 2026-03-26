@@ -72,6 +72,16 @@
       <p id="materialDescription">A relaxed woven texture with a soft, tactile finish and a timeless natural feel.</p>
       <p class="material-note">Individual swatch names and full colour references will be added here as the collection is completed.</p>
     </div>
+    <div class="material-preview" id="materialPreview">
+      <div class="material-preview-stage" id="materialPreviewStage">
+        <div class="material-preview-block" id="materialPreviewBlock"></div>
+      </div>
+      <div class="material-preview-copy">
+        <p class="section-kicker">Selected Cover</p>
+        <h3 id="materialPreviewName">Champagne</h3>
+        <p id="materialPreviewText">Choose a swatch to preview it on the cover block.</p>
+      </div>
+    </div>
     <div class="swatch-grid" id="swatchGrid"></div>
   </section>
 
@@ -79,8 +89,13 @@
     <div class="material-modal-backdrop" data-close="true"></div>
     <div class="material-modal-dialog">
       <button class="material-modal-close" id="materialModalClose" aria-label="Close">×</button>
+      <button class="material-modal-nav material-modal-prev" id="materialModalPrev" aria-label="Previous">‹</button>
+      <button class="material-modal-nav material-modal-next" id="materialModalNext" aria-label="Next">›</button>
       <img id="materialModalImage" src="" alt="" />
-      <p id="materialModalLabel"></p>
+      <div class="material-modal-footer">
+        <p id="materialModalLabel"></p>
+        <button class="btn" id="materialChooseBtn" type="button">Choose This Cover</button>
+      </div>
     </div>
   </div>
 
