@@ -433,7 +433,10 @@ body[data-page="guest-draft-edit"] .cover-thumb,
 body[data-page="new-order"] .cover-thumb{
   width:74px !important;
   height:74px !important;
-  background:#ddd center/cover no-repeat !important;
+  background-color:#ddd !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:cover !important;
   border:1px solid var(--am-line) !important;
   flex:0 0 auto !important;
 }
@@ -492,9 +495,8 @@ body[data-page="new-order"] .swatch-sample{
   aspect-ratio:1/1 !important;
   border:1px solid rgba(0,0,0,.06) !important;
   margin-bottom:10px !important;
-  background:#ece6df !important;
+  background-color:#ece6df !important;
 }
-
 
 @media (max-width:1080px){
   body[data-page] .auth-wrap,
