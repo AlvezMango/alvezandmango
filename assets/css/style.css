@@ -377,6 +377,7 @@ a{text-decoration:none;color:inherit}
   padding-top:0;
   padding-bottom:58px;
 }
+.page-intro h1,
 .page-intro h2{
   margin:0 0 14px;
   font-size:30px;
@@ -1861,3 +1862,7 @@ body[data-page] .cover-thumb img{
   object-fit:cover;
   display:block;
 }
+
+/* Wedding album editorial content */
+.wedding-faq h3{margin-top:2rem;font-size:1.2rem;}
+.copy-narrow a{color:inherit;text-underline-offset:3px;}

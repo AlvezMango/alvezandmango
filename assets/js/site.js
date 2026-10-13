@@ -1,6 +1,6 @@
 // Public-site analytics only; private photographer and admin pages are excluded.
 (function () {
-  const publicPages = ['/', '/index.html', '/albums.html', '/materials.html', '/process.html', '/about.html', '/contact.html', '/albums', '/materials', '/process', '/about', '/contact'];
+  const publicPages = ['/', '/index.html', '/albums.html', '/materials.html', '/process.html', '/about.html', '/contact.html', '/albums', '/materials', '/process', '/about', '/contact', '/wedding-albums-cyprus.html', '/wedding-albums-cyprus'];
   if (!publicPages.includes(window.location.pathname)) return;
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   window.va('beforeSend', function (event) {
