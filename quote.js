@@ -107,6 +107,7 @@
     for(let i=0;i<3;i++)if(!validateStep(i))return;
     const request=model.links(data());
     const email=event.submitter&&event.submitter.value==='email';
+    if(window.va)window.va('event',{name:'Quote Handoff',data:{channel:email?'email':'whatsapp',page:window.location.pathname}});
     const status=document.getElementById('quote-send-status');status.replaceChildren();status.hidden=false;
     const note=document.createElement('p');note.textContent=email?'Your email app should open with the complete request. Please review it and send it there.':'WhatsApp should open with the complete request. Please review it and send it there.';
     const link=document.createElement('a');link.href=email?request.email:request.whatsapp;link.textContent=email?'Open the email request again ↗':'Open the WhatsApp request again ↗';
