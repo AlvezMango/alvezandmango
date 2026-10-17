@@ -17,6 +17,47 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/studio/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/studio",
+      "destination": "https://alvez-photographer-studio.vercel.app/studio"
+    },
+    {
+      "source": "/studio/:path*",
+      "destination": "https://alvez-photographer-studio.vercel.app/studio/:path*"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/photographers/login.html",
+      "destination": "/studio/login",
+      "permanent": false
+    },
+    {
+      "source": "/photographers/register.html",
+      "destination": "/studio/register",
+      "permanent": false
+    },
+    {
+      "source": "/photographers/:path*",
+      "destination": "/studio/photographer-dashboard",
+      "permanent": false
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/studio/pricing-desk",
+      "permanent": false
     }
   ]
 }
